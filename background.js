@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.local.get([`chat_${request.uuid}`], (result) => {
       const payload = result[`chat_${request.uuid}`];
       if (!payload) {
-        const msg = "No payload found, try refreshing the page.";
+        const msg = "No payload found, try refreshing the page. For an existing chat, try sending a simple prompt, e.g. \"List all artifacts\".";
         chrome.tabs.sendMessage(sender.tab.id, {
           action: "artifactsProcessed",
           message: msg,
