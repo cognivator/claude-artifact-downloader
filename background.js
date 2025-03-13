@@ -276,7 +276,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
       });
     }
   },
-  { urls: ["https://api.claude.ai/api/*chat_conversations*"] },
+  { urls: ["https://claude.ai/api/*chat_conversations*", "https://api.claude.ai/api/*chat_conversations*"] },
   ["requestHeaders", "extraHeaders"],
 );
 
