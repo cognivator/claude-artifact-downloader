@@ -94,6 +94,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+function hasArtifacts(message) {
+  const contentArtifacts = (message) => message.content?.filter((msg => {
+    return msg?.name === "artifacts" && msg?.type === "tool_use";
+  })) ?? [];
+  return (
+    message.sender === "assistant"
+    && (
+      message?.text
+      || contentArtifacts(message).length > 0
+    )
+  );
+}
+
 function processMessage(
   message,
   payload,
@@ -104,7 +117,7 @@ function processMessage(
   depth = 0,
 ) {
   // Process assistant messages
-  if (message.sender === "assistant" && message.text) {
+  if (hasArtifacts(message)) {
     try {
       const artifacts = extractArtifacts(message.text);
       artifacts.forEach((artifact, artifactIndex) => {
