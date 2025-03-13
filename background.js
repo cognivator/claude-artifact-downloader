@@ -281,8 +281,21 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 );
 
 function isChatRequest(obj) {
+  const queryParams = obj.url.split("?")[1]?.split("&").reduce((acc, param) => {
+    const [key, value] = param.split("=");
+    acc[key] = decodeURIComponent(value);
+    return acc;
+  }, {});
+  
+  const isTree = queryParams?.tree === "True";
+  const isRaw = queryParams?.rendering_mode === "raw";
+  const isTools = queryParams?.rendering_mode === "messages" && queryParams?.render_all_tools === "true";
   return (
-    obj.url.endsWith("?tree=True&rendering_mode=raw") && obj.method === "GET"
+    obj.method === "GET"
+    && isTree
+    && (
+      isRaw
+      || isTools)
   );
 }
 
