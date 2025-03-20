@@ -247,10 +247,20 @@ function getFileExtension(language) {
     r: ".r",
     matlab: ".m",
   };
-  return languageToExt[language.toLowerCase()] || ".txt";
+  return languageToExt[language?.toLowerCase()] ?? ".txt";
 }
 
 function arrayBufferToBase64(buffer) {
+  if (!(
+    buffer
+    && (
+      buffer instanceof ArrayBuffer
+      || buffer.constructor.name === 'ArrayBuffer')
+    )
+  ) {
+    return '';
+  }
+
   let binary = "";
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
