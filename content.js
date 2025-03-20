@@ -100,7 +100,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.success) {
       createBanner(request.message, "success", 1000);
     } else if (request.failure) {
-      createBanner(request.message, "error", 1000);
+      createBanner(request.message, "error", 4000);
     }
   } else if (request.action === "checkAndAddDownloadButton") {
     // Observe DOM changes to add the button when the container is available
