@@ -207,9 +207,94 @@ This approach minimizes changes to the core functionality while adding new capab
 ## Testing Plan
 
 1. **Compatibility Testing**: Test with both old and new Claude API formats
-2. **Edge Case Testing**: Verify handling of malformed or unexpected responses
+2. **Edge Case Testing**: Verify handling of missing artifacts, unknown artifact types.
 3. **Model Variation Testing**: Test with all supported Claude models
 4. **Fallback Testing**: Verify fallback mechanism works correctly
+
+### Test Runners
+
+#### Unit Testing with Jest and JSDOM
+Jest is used as the primary test runner with JSDOM for browser environment simulation:
+
+- **Test Environment Configuration**: 
+  - JSDOM is configured in `tests/setup.js` to create a simulated browser environment
+  - Each test uses a fresh JSDOM instance to prevent test pollution
+  - Browser globals like `window`, `document`, `navigator` are properly mocked
+
+- **Chrome API Mocking**:
+  - Chrome extension APIs (`chrome.runtime`, `chrome.storage`, etc.) are mocked through Jest
+  - Service worker functions like `importScripts` are mocked to simulate extension runtime
+  - Browser-specific objects (Blob, FileReader, URL) are implemented for full API compatibility
+
+- **Test Execution**:
+  - Tests are consolidated in a single file for better maintainability
+  - `beforeEach` sets up a fresh environment for each test
+  - `afterEach` performs cleanup to prevent environment leakage between tests
+
+- **Coverage Reporting**:
+  - Jest provides built-in code coverage reporting to identify untested code paths
+  - Coverage targets include statements, branches, and functions
+
+#### E2E Testing with Puppeteer
+Puppeteer is recommended for end-to-end testing because it:
+- Has official Chrome extension testing support
+- Works with headless Chrome (using `--headless=new` flag)
+- Can access service workers through `waitForTarget()` and `worker()`
+- Provides direct access to extension background page state
+- Allows interception and mocking of network requests (for simulating Claude API responses)
+
+w### Test Requirements for New API Support
+
+#### 1. Model and API Detection Tests
+- **Structure Analysis Tests**:
+  - Test detection of structured vs. legacy content format
+  - Verify correct identification of Claude 3.5+ vs older API versions
+  - Test with mixed format messages to ensure robust detection
+
+- **API Version Determination Tests**:
+  - Test detection of 'modern', 'claude-3', and 'legacy' API versions
+  - Verify model name extraction when available in metadata
+  - Test boundary cases between API versions
+
+#### 2. Artifact Extraction Tests
+- **Structured Content Extraction**:
+  - Test extraction from `content` array with various block types
+  - Verify correct parsing of block metadata (language, titles)
+  - Test with multiple code blocks in a single message
+
+- **Legacy Extraction**:
+  - Verify regex extraction continues to work with legacy format
+  - Test compatibility with existing artifact format
+  - Ensure backward compatibility with older Claude responses
+
+- **Format Conversion Tests**:
+  - Test conversion of content blocks to artifact format
+  - Verify consistent artifact structure regardless of source format
+
+#### 3. Fallback Mechanism Tests
+- **Cascading Extraction Tests**:
+  - Test fallback from structured to regex extraction
+  - Verify basic text analysis extraction as last resort
+  - Test the complete extraction pipeline with various input formats
+
+- **Error Handling Tests**:
+  - Test response to malformed JSON input
+  - Verify graceful handling of unexpected content block structure
+  - Test with ambiguous formats that don't clearly match any format
+
+#### 4. Integration Tests
+- **Full Processing Flow Tests**:
+  - Test the complete pipeline from detection to extraction
+  - Verify correct artifact counts across different message formats
+  - Test with real-world API responses
+
+- **Cross-Model Testing**:
+  - Test with samples from each major Claude version
+  - Verify identical artifacts extracted regardless of source model
+  - Test with emerging format variations
+
+The test suite will use Jest's mocking capabilities to simulate Chrome APIs and the jest-chrome package for enhanced Chrome API support. Appropriate test fixtures will be created to represent the different Claude API response formats.
+
 
 ## Timeline
 
