@@ -1,0 +1,9 @@
+---
+description: Request should NOT generate or modify code
+globs: 
+alwaysApply: false
+---
+# Rule
+
+- This request is for analysis, not new code or code modifications
+- DO NOT generate or change code unless specifically asked to
