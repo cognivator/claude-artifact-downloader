@@ -29,7 +29,7 @@ describe('Background.js Functions', () => {
   describe('extractArtifacts', () => {
     test('should parse artifact tags correctly', () => {
       const sampleText = '<antArtifact title="test" language="javascript">const x = 1;</antArtifact>';
-      const artifacts = window.extractArtifacts(sampleText);
+      const artifacts = extractArtifacts(sampleText);
       
       expect(artifacts).toHaveLength(1);
       expect(artifacts[0].title).toBe('test');
@@ -43,7 +43,7 @@ describe('Background.js Functions', () => {
         <p>Some text in between</p>
         <antArtifact title="file2" language="python">print("File 2")</antArtifact>
       `;
-      const result = window.extractArtifacts(text);
+      const result = extractArtifacts(text);
       
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
@@ -60,7 +60,7 @@ describe('Background.js Functions', () => {
   
     test('should use default values for missing attributes', () => {
       const text = '<antArtifact>const data = "No title or language";</antArtifact>';
-      const result = window.extractArtifacts(text);
+      const result = extractArtifacts(text);
       
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -79,7 +79,7 @@ describe('Background.js Functions', () => {
           </div>
         </antArtifact>
       `;
-      const result = window.extractArtifacts(text);
+      const result = extractArtifacts(text);
       
       expect(result).toHaveLength(1);
       expect(result[0].title).toBe('html-example');
@@ -90,7 +90,7 @@ describe('Background.js Functions', () => {
   
     test('should return empty array when no artifacts are found', () => {
       const text = 'This is just some text without any artifacts.';
-      const result = window.extractArtifacts(text);
+      const result = extractArtifacts(text);
       
       expect(result).toEqual([]);
     });
@@ -106,7 +106,7 @@ def hello():
 hello()
         </antArtifact>
       `;
-      const result = window.extractArtifacts(text);
+      const result = extractArtifacts(text);
       
       expect(result).toHaveLength(1);
       expect(result[0].content.split('\n').length).toBeGreaterThan(1);
@@ -118,36 +118,36 @@ hello()
   // Tests for getFileExtension
   describe('getFileExtension', () => {
     test('should return correct extension for all supported content types', () => {
-      expect(window.getFileExtension('javascript')).toBe('.js');
-      expect(window.getFileExtension('typescript')).toBe('.ts');
-      expect(window.getFileExtension('html')).toBe('.html');
-      expect(window.getFileExtension('css')).toBe('.css');
-      expect(window.getFileExtension('python')).toBe('.py');
-      expect(window.getFileExtension('java')).toBe('.java');
-      expect(window.getFileExtension('c')).toBe('.c');
-      expect(window.getFileExtension('cpp')).toBe('.cpp');
-      expect(window.getFileExtension('ruby')).toBe('.rb');
-      expect(window.getFileExtension('php')).toBe('.php');
-      expect(window.getFileExtension('swift')).toBe('.swift');
-      expect(window.getFileExtension('go')).toBe('.go');
-      expect(window.getFileExtension('rust')).toBe('.rs');
-      expect(window.getFileExtension('shell')).toBe('.sh');
-      expect(window.getFileExtension('sql')).toBe('.sql');
-      expect(window.getFileExtension('kotlin')).toBe('.kt');
-      expect(window.getFileExtension('scala')).toBe('.scala');
-      expect(window.getFileExtension('r')).toBe('.r');
-      expect(window.getFileExtension('matlab')).toBe('.m');      
+      expect(getFileExtension('javascript')).toBe('.js');
+      expect(getFileExtension('typescript')).toBe('.ts');
+      expect(getFileExtension('html')).toBe('.html');
+      expect(getFileExtension('css')).toBe('.css');
+      expect(getFileExtension('python')).toBe('.py');
+      expect(getFileExtension('java')).toBe('.java');
+      expect(getFileExtension('c')).toBe('.c');
+      expect(getFileExtension('cpp')).toBe('.cpp');
+      expect(getFileExtension('ruby')).toBe('.rb');
+      expect(getFileExtension('php')).toBe('.php');
+      expect(getFileExtension('swift')).toBe('.swift');
+      expect(getFileExtension('go')).toBe('.go');
+      expect(getFileExtension('rust')).toBe('.rs');
+      expect(getFileExtension('shell')).toBe('.sh');
+      expect(getFileExtension('sql')).toBe('.sql');
+      expect(getFileExtension('kotlin')).toBe('.kt');
+      expect(getFileExtension('scala')).toBe('.scala');
+      expect(getFileExtension('r')).toBe('.r');
+      expect(getFileExtension('matlab')).toBe('.m');      
     });
     
     test('should return .txt for unknown language', () => {
-      expect(window.getFileExtension('unknown')).toBe('.txt');
+      expect(getFileExtension('unknown')).toBe('.txt');
     });
     
     test('should handle uppercase and mixed case language names', () => {
-      expect(window.getFileExtension('JAVASCRIPT')).toBe('.js');
-      expect(window.getFileExtension('Python')).toBe('.py');
-      expect(window.getFileExtension('TypeScript')).toBe('.ts');
-      expect(window.getFileExtension('CsS')).toBe('.css');
+      expect(getFileExtension('JAVASCRIPT')).toBe('.js');
+      expect(getFileExtension('Python')).toBe('.py');
+      expect(getFileExtension('TypeScript')).toBe('.ts');
+      expect(getFileExtension('CsS')).toBe('.css');
     });
   
     test('should handle empty, null, or undefined input', () => {
@@ -170,13 +170,13 @@ hello()
       let input = {name: '', value: ''};
       try {
         input = {name: 'empty', value: ''};
-        expect(window.getFileExtension(input.value)).toBe('.txt');
+        expect(getFileExtension(input.value)).toBe('.txt');
 
         input = {name: 'null', value: null};
-        expect(window.getFileExtension(input.value)).toBe('.txt');
+        expect(getFileExtension(input.value)).toBe('.txt');
         
         input = {name: 'undefined', value: undefined};
-        expect(window.getFileExtension(input.value)).toBe('.txt');
+        expect(getFileExtension(input.value)).toBe('.txt');
 
       } catch (e) {
         throw new Error(`fails when input is ${input.name}`);
@@ -199,13 +199,13 @@ hello()
       view[2] = 115; // 's'
       view[3] = 116; // 't'
       
-      const result = window.arrayBufferToBase64(buffer);
+      const result = arrayBufferToBase64(buffer);
       expect(result).toBe('VGVzdA=='); // 'Test' in base64
     });
     
     test('should convert empty buffer to an empty base64 string', () => {
       const buffer = new Uint8Array([]).buffer;
-      const result = window.arrayBufferToBase64(buffer);
+      const result = arrayBufferToBase64(buffer);
       expect(result).toBe('');
     });
     
@@ -230,8 +230,8 @@ hello()
       // expect(() => window.arrayBufferToBase64(undefined)).toThrow();
 
       // But what we actually want is to return ''
-      expect(window.arrayBufferToBase64(null)).toBe('');
-      expect(window.arrayBufferToBase64(undefined)).toBe('');
+      expect(arrayBufferToBase64(null)).toBe('');
+      expect(arrayBufferToBase64(undefined)).toBe('');
     });
     
     test('should handle non-ArrayBuffer input', () => {
@@ -258,22 +258,22 @@ hello()
       // }
 
       // But what we actually want is to return ''
-      expect(window.arrayBufferToBase64('not a buffer')).toBe('');
-      expect(window.arrayBufferToBase64(123)).toBe('');
-      expect(window.arrayBufferToBase64({})).toBe('');
+      expect(arrayBufferToBase64('not a buffer')).toBe('');
+      expect(arrayBufferToBase64(123)).toBe('');
+      expect(arrayBufferToBase64({})).toBe('');
     });
     
     test('should convert buffer with ASCII characters to base64', () => {
       const text = 'Hello, World!';
       const buffer = new TextEncoder().encode(text).buffer;
-      const result = window.arrayBufferToBase64(buffer);
+      const result = arrayBufferToBase64(buffer);
       expect(result).toBe('SGVsbG8sIFdvcmxkIQ==');
     });
 
     test('should convert buffer with special characters to base64', () => {
       const text = '🚀 Testing 123 !@#$%^&*()';
       const buffer = new TextEncoder().encode(text).buffer;
-      const result = window.arrayBufferToBase64(buffer);
+      const result = arrayBufferToBase64(buffer);
       
       // Instead of comparing exact strings, decode and compare buffer contents
       const resultDecoded = Buffer.from(result, 'base64');
@@ -287,87 +287,87 @@ hello()
   // Tests for inferDirectoryStructure
   describe('inferDirectoryStructure', () => {
     test('should handle flat file', () => {
-      const result = window.inferDirectoryStructure('test', '.js');
+      const result = inferDirectoryStructure('test', '.js');
       expect(result).toBe('test.js');
     });
     
     test('should handle flat file with message index', () => {
-      const result = window.inferDirectoryStructure('test', '.js', 5);
+      const result = inferDirectoryStructure('test', '.js', 5);
       expect(result).toBe('6_test.js');
     });
     
     test('should handle flat file with suffix', () => {
-      const result = window.inferDirectoryStructure('test', '.js', undefined, '_modified');
+      const result = inferDirectoryStructure('test', '.js', undefined, '_modified');
       expect(result).toBe('test_modified.js');
     });
     
     test('should handle flat file with message index and suffix', () => {
-      const result = window.inferDirectoryStructure('test', '.js', 3, '_modified');
+      const result = inferDirectoryStructure('test', '.js', 3, '_modified');
       expect(result).toBe('4_test_modified.js');
     });
   
     test('should handle directory structure', () => {
-      const result = window.inferDirectoryStructure('src/utils/test', '.js');
+      const result = inferDirectoryStructure('src/utils/test', '.js');
       expect(result).toBe('src/utils/test.js');
     });
     
     test('should handle directory structure with message index', () => {
-      const result = window.inferDirectoryStructure('src/utils/test', '.js', 5);
+      const result = inferDirectoryStructure('src/utils/test', '.js', 5);
       expect(result).toBe('src/utils/6_test.js');
     });
     
     test('should handle directory structure with suffix', () => {
-      const result = window.inferDirectoryStructure('src/utils/helper', '.js', undefined, '_modified');
+      const result = inferDirectoryStructure('src/utils/helper', '.js', undefined, '_modified');
       expect(result).toBe('src/utils/helper_modified.js');
     });
   
     test('should handle directory structure with message index and suffix', () => {
-      const result = window.inferDirectoryStructure('utils/helper', '.js', 2, '_modified');
+      const result = inferDirectoryStructure('utils/helper', '.js', 2, '_modified');
       expect(result).toBe('utils/3_helper_modified.js');
     });
   
     test('should handle message index of 0 correctly', () => {
-      const result = window.inferDirectoryStructure('utils/helper', '.js', 0);
+      const result = inferDirectoryStructure('utils/helper', '.js', 0);
       expect(result).toBe('utils/1_helper.js');
     });
   
     test('should handle empty base name', () => {
-      const result = window.inferDirectoryStructure('', '.txt');
+      const result = inferDirectoryStructure('', '.txt');
       expect(result).toBe('.txt');
     });
   
     test('should handle empty base name with message index', () => {
-      const result = window.inferDirectoryStructure('', '.txt', 1);
+      const result = inferDirectoryStructure('', '.txt', 1);
       expect(result).toBe('2_.txt');
     });
 
     test('should handle empty base name with suffix', () => {
-      const result = window.inferDirectoryStructure('', '.txt', undefined, '_modified');
+      const result = inferDirectoryStructure('', '.txt', undefined, '_modified');
       expect(result).toBe('_modified.txt');
     });
 
     test('should handle empty base name with message index and suffix', () => {
-      const result = window.inferDirectoryStructure('', '.txt', 1, '_modified');
+      const result = inferDirectoryStructure('', '.txt', 1, '_modified');
       expect(result).toBe('2__modified.txt');
     });
 
     test('should handle empty extension', () => {
-      const result = window.inferDirectoryStructure('test', '');
+      const result = inferDirectoryStructure('test', '');
       expect(result).toBe('test');
     });
   
     test('should handle empty extension with message index', () => {
-      const result = window.inferDirectoryStructure('test', '', 1);
+      const result = inferDirectoryStructure('test', '', 1);
       expect(result).toBe('2_test');
     });
 
     test('should handle empty extension with suffix', () => {
-      const result = window.inferDirectoryStructure('test', '', undefined, '_modified');
+      const result = inferDirectoryStructure('test', '', undefined, '_modified');
       expect(result).toBe('test_modified');
     });
 
     test('should handle empty extension with message index and suffix', () => {
-      const result = window.inferDirectoryStructure('test', '', 1, '_modified');
+      const result = inferDirectoryStructure('test', '', 1, '_modified');
       expect(result).toBe('2_test_modified');
     });
   });
@@ -376,7 +376,7 @@ hello()
   describe('getUniqueFileName', () => {
     test('should generate a file name with message index for flat structure', () => {
       const usedNames = new Set();
-      const result = window.getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
+      const result = getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
       
       expect(result).toBe('2_test-file.js');
       expect(usedNames.has('2_test-file.js')).toBe(true);
@@ -384,7 +384,7 @@ hello()
   
     test('should use directory structure when option is enabled', () => {
       const usedNames = new Set();
-      const result = window.getUniqueFileName('src/components/Button', 'javascript', 1, usedNames, true);
+      const result = getUniqueFileName('src/components/Button', 'javascript', 1, usedNames, true);
       
       expect(result).toBe('src_components_Button.js');
       expect(usedNames.has('src_components_Button.js')).toBe(true);
@@ -392,7 +392,7 @@ hello()
   
     test('should sanitize file names by replacing non-alphanumeric chars', () => {
       const usedNames = new Set();
-      const result = window.getUniqueFileName('file with spaces!@#$', 'python', 1, usedNames, false);
+      const result = getUniqueFileName('file with spaces!@#$', 'python', 1, usedNames, false);
       
       expect(result).toBe('2_file_with_spaces_.py');
       expect(usedNames.has('2_file_with_spaces_.py')).toBe(true);
@@ -400,7 +400,7 @@ hello()
   
     test('should append suffix if name collision occurs', () => {
       const usedNames = new Set(['2_test-file.js']);
-      const result = window.getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
+      const result = getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
       
       expect(result).toBe('2_test-file_*.js');
       expect(usedNames.has('2_test-file_*.js')).toBe(true);
@@ -408,7 +408,7 @@ hello()
   
     test('should handle multiple name collisions by increasing suffix', () => {
       const usedNames = new Set(['2_test-file.js', '2_test-file_*.js']);
-      const result = window.getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
+      const result = getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
       
       expect(result).toBe('2_test-file_**.js');
       expect(usedNames.has('2_test-file_**.js')).toBe(true);
@@ -416,7 +416,7 @@ hello()
   
     test('should handle empty title', () => {
       const usedNames = new Set();
-      const result = window.getUniqueFileName('', 'python', 0, usedNames, false);
+      const result = getUniqueFileName('', 'python', 0, usedNames, false);
       
       expect(result).toBe('1_.py');
     });
@@ -424,16 +424,16 @@ hello()
     test('should handle null or undefined inputs with default values', () => {
       const usedNames = new Set();
       
-      const result1 = window.getUniqueFileName('', 'javascript', 0, usedNames, false);
+      const result1 = getUniqueFileName('', 'javascript', 0, usedNames, false);
       expect(result1).toBe('1_.js');
       
-      const result2 = window.getUniqueFileName('test', '', 0, usedNames, false);
+      const result2 = getUniqueFileName('test', '', 0, usedNames, false);
       expect(result2).toBe('1_test.txt');
     });
     
     test('should handle name collisions in directory structure', () => {
       const usedNames = new Set(['src_components_Button.js']);
-      const result = window.getUniqueFileName('src/components/Button', 'javascript', 1, usedNames, true);
+      const result = getUniqueFileName('src/components/Button', 'javascript', 1, usedNames, true);
       
       // The actual implementation uses underscores not slashes for directory structure
       expect(result).toBe('2_src_components_Button_*.js');
@@ -442,14 +442,14 @@ hello()
     
     test('should use directory structure with index when collision occurs', () => {
       const usedNames = new Set();
-      const result1 = window.getUniqueFileName('src/utils/helper', 'javascript', 1, usedNames, true);
+      const result1 = getUniqueFileName('src/utils/helper', 'javascript', 1, usedNames, true);
       
       // The actual implementation uses underscores not slashes
       expect(result1).toBe('src_utils_helper.js');
       expect(usedNames.has('src_utils_helper.js')).toBe(true);
       
       // Now try with same path but different message index
-      const result2 = window.getUniqueFileName('src/utils/helper', 'javascript', 2, usedNames, true);
+      const result2 = getUniqueFileName('src/utils/helper', 'javascript', 2, usedNames, true);
       
       // Due to collision, it will add a suffix
       expect(result2).toBe('3_src_utils_helper_*.js');
@@ -487,7 +487,7 @@ hello()
       };
       
       // Call the function
-      const result = window.processMessage(message, payload, zipMock, usedNames, 0, false, 0);
+      const result = processMessage(message, payload, zipMock, usedNames, 0, false, 0);
       
       // Assert that zip.file was called to add the artifact
       expect(zipMock.file).toHaveBeenCalled();
@@ -515,7 +515,7 @@ hello()
       };
       
       // Call the function
-      const result = window.processMessage(message, payload, zipMock, usedNames, 0, false, 0);
+      const result = processMessage(message, payload, zipMock, usedNames, 0, false, 0);
       
       // Assert that zip.file was called twice
       expect(zipMock.file).toHaveBeenCalledTimes(2);
@@ -541,7 +541,7 @@ hello()
       };
       
       // Call the function
-      const result = window.processMessage(message, payload, zipMock, usedNames, 0, false, 0);
+      const result = processMessage(message, payload, zipMock, usedNames, 0, false, 0);
       
       // Assert that zip.file was not called
       expect(zipMock.file).not.toHaveBeenCalled();
@@ -583,7 +583,7 @@ hello()
       };
       
       // Call the function with the parent message
-      const result = window.processMessage(parentMessage, payload, zipMock, usedNames, 0, false, 0);
+      const result = processMessage(parentMessage, payload, zipMock, usedNames, 0, false, 0);
       
       // Assert that zip.file was called three times
       expect(zipMock.file).toHaveBeenCalledTimes(3);
@@ -610,7 +610,7 @@ hello()
       };
       
       // Call the function with depth exceeding the limit
-      const result = window.processMessage(message, payload, zipMock, usedNames, 0, false, 101);
+      const result = processMessage(message, payload, zipMock, usedNames, 0, false, 101);
       
       // Should have added the artifact but warned about depth
       expect(zipMock.file).toHaveBeenCalled();
@@ -680,7 +680,7 @@ hello()
           { name: 'X-Own-Request', value: 'true' }
         ]
       };
-      expect(window.isOwnRequest(request)).toBe(true);
+      expect(isOwnRequest(request)).toBe(true);
     });
   
     test('should reject request without X-Own-Request header', () => {
@@ -690,19 +690,21 @@ hello()
           { name: 'Authorization', value: 'Bearer token' }
         ]
       };
-      expect(window.isOwnRequest(request)).toBe(false);
+      expect(isOwnRequest(request)).toBe(false);
     });
   
     test('should handle case where requestHeaders is empty', () => {
       const request = {
         requestHeaders: []
       };
-      expect(window.isOwnRequest(request)).toBe(false);
+      expect(isOwnRequest(request)).toBe(false);
     });
   
     test('should handle case where requestHeaders is undefined', () => {
       const request = {};
-      expect(window.isOwnRequest(request)).toBe(false);
+      expect(isOwnRequest(request)).toBe(false);
+    });
+  
     });
   
     test('should handle null or undefined input', () => {
