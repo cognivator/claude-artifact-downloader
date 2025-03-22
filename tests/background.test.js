@@ -714,6 +714,9 @@ hello()
       expect(isOwnRequest(request)).toBe(false);
     });
   
+    test('should handle case where request is malformed', () => {
+      const request = [];
+      expect(isOwnRequest(request)).toBe(false);
     });
   
     test('should handle null or undefined input', () => {
