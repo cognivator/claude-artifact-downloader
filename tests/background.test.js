@@ -636,7 +636,7 @@ hello()
     test('should correctly identify Claude chat API request', () => {
       const request = {
         method: 'GET',
-        url: 'https://claude.ai/api/organizations/org-123/chat_conversations/chat-456/messages'
+        url: 'https://claude.ai/api/organizations/org-123/chat_conversations/chat-456/messages?tree=True&rendering_mode=raw'
       };
       // expect(testIsChatRequest(request)).toBe(true);
       expect(isChatRequest(request)).toBe(true);
@@ -645,7 +645,7 @@ hello()
     test('should reject non-GET request', () => {
       const request = {
         method: 'POST',
-        url: 'https://claude.ai/api/organizations/org-123/chat_conversations/chat-456/messages'
+        url: 'https://claude.ai/api/organizations/org-123/chat_conversations/chat-456/messages?tree=True&rendering_mode=raw'
       };
       // expect(testIsChatRequest(request)).toBe(false);
       expect(isChatRequest(request)).toBe(false);
@@ -674,7 +674,7 @@ hello()
     test('should handle subdomain variations', () => {
       const request = {
         method: 'GET',
-        url: 'https://subdomain.claude.ai/api/organizations/12345/chat_conversations/67890/messages'
+        url: 'https://subdomain.claude.ai/api/organizations/12345/chat_conversations/67890/messages?tree=True&rendering_mode=raw'
       };
       // expect(testIsChatRequest(request)).toBeTruthy();
       expect(isChatRequest(request)).toBeTruthy();
