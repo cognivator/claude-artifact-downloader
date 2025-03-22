@@ -177,6 +177,7 @@ function extractArtifacts(text) {
   return artifacts;
 }
 
+// FIXME: This is not generating directory structures correctly
 function getUniqueFileName(
   title,
   language,
