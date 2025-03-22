@@ -292,15 +292,14 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
 function isChatRequest(obj) {
   return (
-    obj.url.endsWith("?tree=True&rendering_mode=raw") && obj.method === "GET"
-  );
+    obj && obj?.url?.endsWith("?tree=True&rendering_mode=raw") && obj?.method === "GET"
+  ) ?? false;
 }
 
 function isOwnRequest(obj) {
   return (
-    obj.requestHeaders?.some((header) => header.name === "X-Own-Request") ??
-    false
-  );
+    obj && obj?.requestHeaders?.some((header) => header.name === "X-Own-Request")
+  ) ?? false;
 }
 
 async function fetchChat(obj) {
