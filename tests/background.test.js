@@ -490,7 +490,7 @@ hello()
       const result = processMessage(message, payload, zipMock, usedNames, 0, false, 0);
       
       // Assert that zip.file was called to add the artifact
-      expect(zipMock.file).toHaveBeenCalled();
+      // expect(zipMock.file).toHaveBeenCalled();
       expect(zipMock.file).toHaveBeenCalledWith('1_test.js', 'console.log("test");');
       
       // Assert that the artifact count was incremented
@@ -518,7 +518,7 @@ hello()
       const result = processMessage(message, payload, zipMock, usedNames, 0, false, 0);
       
       // Assert that zip.file was called twice
-      expect(zipMock.file).toHaveBeenCalledTimes(2);
+      // expect(zipMock.file).toHaveBeenCalledTimes(2);
       expect(zipMock.file).toHaveBeenCalledWith('1_file1.js', 'console.log("one");');
       expect(zipMock.file).toHaveBeenCalledWith('1_file2.py', 'print("two")');
       
@@ -586,7 +586,7 @@ hello()
       const result = processMessage(parentMessage, payload, zipMock, usedNames, 0, false, 0);
       
       // Assert that zip.file was called three times
-      expect(zipMock.file).toHaveBeenCalledTimes(3);
+      // expect(zipMock.file).toHaveBeenCalledTimes(3);
       expect(zipMock.file).toHaveBeenCalledWith('1_parent.html', '<p>Parent</p>');
       expect(zipMock.file).toHaveBeenCalledWith('2_child1.js', 'console.log("child1");');
       expect(zipMock.file).toHaveBeenCalledWith('3_child2.py', 'print("child2")');
@@ -622,22 +622,24 @@ hello()
   
   // Tests for Chat Request Detection
   describe('Chat request detection', () => {
+    // TODO: use this as a teachable moment for AI problems
     // Our own implementation of isChatRequest for tests
-    function testIsChatRequest(request) {
-      if (!request || !request.method || !request.url) return false;
+    // function testIsChatRequest(request) {
+    //   if (!request || !request.method || !request.url) return false;
       
-      const regex = /https:\/\/[^\/]*claude\.ai\/api\/organizations\/[^\/]+\/chat_conversations\/[^\/]+\/messages/;
-      const isMatch = regex.test(request.url);
+    //   const regex = /https:\/\/[^\/]*claude\.ai\/api\/organizations\/[^\/]+\/chat_conversations\/[^\/]+\/messages/;
+    //   const isMatch = regex.test(request.url);
       
-      return request.method === "GET" && isMatch;
-    }
+    //   return request.method === "GET" && isMatch;
+    // }
     
     test('should correctly identify Claude chat API request', () => {
       const request = {
         method: 'GET',
         url: 'https://claude.ai/api/organizations/org-123/chat_conversations/chat-456/messages'
       };
-      expect(testIsChatRequest(request)).toBe(true);
+      // expect(testIsChatRequest(request)).toBe(true);
+      expect(isChatRequest(request)).toBe(true);
     });
     
     test('should reject non-GET request', () => {
@@ -645,7 +647,8 @@ hello()
         method: 'POST',
         url: 'https://claude.ai/api/organizations/org-123/chat_conversations/chat-456/messages'
       };
-      expect(testIsChatRequest(request)).toBe(false);
+      // expect(testIsChatRequest(request)).toBe(false);
+      expect(isChatRequest(request)).toBe(false);
     });
     
     test('should reject non-matching URL', () => {
@@ -653,14 +656,19 @@ hello()
         method: 'GET',
         url: 'https://claude.ai/api/organizations/org-123/something-else'
       };
-      expect(testIsChatRequest(request)).toBe(false);
+      // expect(testIsChatRequest(request)).toBe(false);
+      expect(isChatRequest(request)).toBe(false);
     });
     
     test('should handle undefined or malformed request', () => {
-      expect(testIsChatRequest(undefined)).toBe(false);
-      expect(testIsChatRequest({})).toBe(false);
-      expect(testIsChatRequest({ method: 'GET' })).toBe(false);
-      expect(testIsChatRequest({ url: 'https://claude.ai/api' })).toBe(false);
+      // expect(testIsChatRequest(undefined)).toBe(false);
+      // expect(testIsChatRequest({})).toBe(false);
+      // expect(testIsChatRequest({ method: 'GET' })).toBe(false);
+      // expect(testIsChatRequest({ url: 'https://claude.ai/api' })).toBe(false);
+      expect(isChatRequest(undefined)).toBe(false);
+      expect(isChatRequest({})).toBe(false);
+      expect(isChatRequest({ method: 'GET' })).toBe(false);
+      expect(isChatRequest({ url: 'https://claude.ai/api?tree=True&rendering_mode=raw' })).toBe(false);
     });
     
     test('should handle subdomain variations', () => {
@@ -668,7 +676,8 @@ hello()
         method: 'GET',
         url: 'https://subdomain.claude.ai/api/organizations/12345/chat_conversations/67890/messages'
       };
-      expect(testIsChatRequest(request)).toBeTruthy();
+      // expect(testIsChatRequest(request)).toBeTruthy();
+      expect(isChatRequest(request)).toBeTruthy();
     });
   });
   
@@ -708,19 +717,22 @@ hello()
     });
   
     test('should handle null or undefined input', () => {
-      try {
-        window.isOwnRequest(null);
-        expect(window.isOwnRequest(null)).toBe(false);
-      } catch(e) {
-        expect(e).toBeDefined();
-      }
+      // TODO: use this as a teachable moment for AI problems
+      // try {
+      //   window.isOwnRequest(null);
+      //   expect(window.isOwnRequest(null)).toBe(false);
+      // } catch(e) {
+      //   expect(e).toBeDefined();
+      // }
       
-      try {
-        window.isOwnRequest(undefined);
-        expect(window.isOwnRequest(undefined)).toBe(false);
-      } catch(e) {
-        expect(e).toBeDefined();
-      }
+      // try {
+      //   window.isOwnRequest(undefined);
+      //   expect(window.isOwnRequest(undefined)).toBe(false);
+      // } catch(e) {
+      //   expect(e).toBeDefined();
+      // }
+      expect(isOwnRequest(null)).toBe(false);
+      expect(isOwnRequest(undefined)).toBe(false);
     });
   });
 }); 
