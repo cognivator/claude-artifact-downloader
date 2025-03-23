@@ -10,7 +10,30 @@ global.TextDecoder = TextDecoder;
 const { JSDOM } = require('jsdom');
 
 // Create a function to set up a fresh JSDOM environment for each test
-function setupTestEnvironment() {
+function setupTestEnvironment(log=false) {
+
+  const logger = log ? console : {
+    log: ()=>{},
+    error: ()=>{},
+    warn: ()=>{},
+    info: ()=>{},
+    debug: ()=>{},
+    trace: ()=>{},
+    dir: ()=>{}, 
+    table: ()=>{},
+    clear: ()=>{},
+    count: ()=>{},
+    countReset: ()=>{},
+    group: ()=>{},
+    groupCollapsed: ()=>{},  
+  };
+
+  logger.log('__dirname', __dirname);
+  logger.log('__filename', __filename);
+  logger.log('process.cwd()', process.cwd());
+  logger.log('process.env', process.env);
+  logger.log('process.argv', process.argv);
+
   // Create a new JSDOM instance
   const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {
     url: 'https://claude.ai/chat/123e4567-e89b-12d3-a456-426614174000',
@@ -29,37 +52,37 @@ function setupTestEnvironment() {
   // Mock importScripts function - needed by service workers
   window.importScripts = function() {
     // No-op implementation
-    console.log('Mock importScripts called with:', [...arguments]);
+    logger.log('Mock importScripts called with:', [...arguments]);
   };
 
   // Mock Chrome API for unit testing
   global.chrome = window.chrome = {
     runtime: {
       onMessage: {
-        addListener: jest.fn(),
-        removeListener: jest.fn()
+        addListener: jest.fn((args)=>{logger.log('runtime.onMessage listener added', args)}),
+        removeListener: jest.fn((args)=>{logger.log('runtime.onMessage listener removed', args)})
       },
-      sendMessage: jest.fn(),
+      sendMessage: jest.fn((args)=>{logger.log('runtime.sendMessage called', args)}),
       lastError: null
     },
     storage: {
       local: {
-        get: jest.fn(),
-        set: jest.fn()
+        get: jest.fn((args)=>{logger.log('storage.local.get called', args)}),
+        set: jest.fn((args)=>{logger.log('storage.local.set called', args)})
       }
     },
     tabs: {
-      sendMessage: jest.fn(),
+      sendMessage: jest.fn((args)=>{logger.log('tabs.sendMessage called', args)}),
       onUpdated: {
-        addListener: jest.fn()
+        addListener: jest.fn((args)=>{logger.log('tabs.onUpdated listener added', args)})
       }
     },
     downloads: {
-      download: jest.fn()
+      download: jest.fn((args)=>{logger.log('downloads.download called', args)})
     },
     webRequest: {
       onBeforeSendHeaders: {
-        addListener: jest.fn()
+        addListener: jest.fn((args)=>{logger.log('webRequest.onBeforeSendHeaders listener added', args)})
       }
     }
   };
@@ -137,7 +160,7 @@ function setupTestEnvironment() {
     scriptEl.textContent = backgroundJs;
     document.body.appendChild(scriptEl);
   } catch (error) {
-    console.error('Error loading background.js:', error);
+    logger.error('Error loading background.js:', error);
     throw new Error(`Failed to load background.js: ${error.message}`);
   }
 
