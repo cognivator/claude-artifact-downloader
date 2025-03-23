@@ -1,5 +1,9 @@
 // Import our setup file
-const { setupTestEnvironment } = require('./setup');
+const { setupTestEnvironment, cleanup } = require('./setup');
+
+afterAll(() => {
+  cleanup();
+});
 
 describe('Background.js Functions', () => {
   let testEnv;

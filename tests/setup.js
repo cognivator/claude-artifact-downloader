@@ -173,10 +173,13 @@ function setupTestEnvironment(log=false) {
 }
 
 // Set up the environment immediately for tests that import this module
-const { dom, cleanup } = setupTestEnvironment();
+// const { dom, cleanup } = setupTestEnvironment();
+const { dom, cleanup } = {dom: {}, cleanup: ()=>{console.log('cleanup - setup.js load')}};
+
 
 // Export the cleanup function and setup function for use in tests
 module.exports = {
+  dom,
   cleanup,
   setupTestEnvironment
 }; 
