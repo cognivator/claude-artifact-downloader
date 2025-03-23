@@ -16,8 +16,18 @@ const config = {
   clearMocks: true,
   
   // Collect coverage information
-  collectCoverage: true,
-  
+  collectCoverage: false,
+  collectCoverageFrom: [
+    "**/*.{js,jsx}", 
+    "!**/node_modules/**",
+    "!**/vendor/**",
+    "!**/tests/**",
+    "!**/coverage/**",
+    "!**/.history/**",
+    "!**/*.min.*",
+    "!**/*.config.*"
+  ],
+
   // Where to output coverage files
   coverageDirectory: 'coverage',
   
@@ -31,8 +41,7 @@ const config = {
 
   // Files to include for tests
   testMatch: [
-    '**/__tests__/**/*.test.js',
-    '**/tests/*.test.js'
+    '**/*.test.js'
   ]
 };
 
