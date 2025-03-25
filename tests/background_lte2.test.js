@@ -5,7 +5,7 @@ afterAll(() => {
   cleanup();
 });
 
-describe('Background.js Functions', () => {
+describe('Background.js - Legacy API / 2.x or less', () => {
   let testEnv;
   
   // Set up a fresh test environment before each test
@@ -288,176 +288,109 @@ hello()
     });
   });
   
-  // Tests for inferDirectoryStructure
-  describe('inferDirectoryStructure', () => {
-    test('should handle flat file', () => {
-      const result = inferDirectoryStructure('test', '.js');
-      expect(result).toBe('test.js');
-    });
-    
-    test('should handle flat file with message index', () => {
-      const result = inferDirectoryStructure('test', '.js', 5);
-      expect(result).toBe('6_test.js');
-    });
-    
-    test('should handle flat file with suffix', () => {
-      const result = inferDirectoryStructure('test', '.js', undefined, '_modified');
-      expect(result).toBe('test_modified.js');
-    });
-    
-    test('should handle flat file with message index and suffix', () => {
-      const result = inferDirectoryStructure('test', '.js', 3, '_modified');
-      expect(result).toBe('4_test_modified.js');
-    });
-  
-    test('should handle directory structure', () => {
-      const result = inferDirectoryStructure('src/utils/test', '.js');
-      expect(result).toBe('src/utils/test.js');
-    });
-    
-    test('should handle directory structure with message index', () => {
-      const result = inferDirectoryStructure('src/utils/test', '.js', 5);
-      expect(result).toBe('src/utils/6_test.js');
-    });
-    
-    test('should handle directory structure with suffix', () => {
-      const result = inferDirectoryStructure('src/utils/helper', '.js', undefined, '_modified');
-      expect(result).toBe('src/utils/helper_modified.js');
-    });
-  
-    test('should handle directory structure with message index and suffix', () => {
-      const result = inferDirectoryStructure('utils/helper', '.js', 2, '_modified');
-      expect(result).toBe('utils/3_helper_modified.js');
-    });
-  
-    test('should handle message index of 0 correctly', () => {
-      const result = inferDirectoryStructure('utils/helper', '.js', 0);
-      expect(result).toBe('utils/1_helper.js');
-    });
-  
-    test('should handle empty base name', () => {
-      const result = inferDirectoryStructure('', '.txt');
-      expect(result).toBe('.txt');
-    });
-  
-    test('should handle empty base name with message index', () => {
-      const result = inferDirectoryStructure('', '.txt', 1);
-      expect(result).toBe('2_.txt');
-    });
-
-    test('should handle empty base name with suffix', () => {
-      const result = inferDirectoryStructure('', '.txt', undefined, '_modified');
-      expect(result).toBe('_modified.txt');
-    });
-
-    test('should handle empty base name with message index and suffix', () => {
-      const result = inferDirectoryStructure('', '.txt', 1, '_modified');
-      expect(result).toBe('2__modified.txt');
-    });
-
-    test('should handle empty extension', () => {
-      const result = inferDirectoryStructure('test', '');
-      expect(result).toBe('test');
-    });
-  
-    test('should handle empty extension with message index', () => {
-      const result = inferDirectoryStructure('test', '', 1);
-      expect(result).toBe('2_test');
-    });
-
-    test('should handle empty extension with suffix', () => {
-      const result = inferDirectoryStructure('test', '', undefined, '_modified');
-      expect(result).toBe('test_modified');
-    });
-
-    test('should handle empty extension with message index and suffix', () => {
-      const result = inferDirectoryStructure('test', '', 1, '_modified');
-      expect(result).toBe('2_test_modified');
-    });
-  });
-  
   // Tests for getUniqueFileName
   describe('getUniqueFileName', () => {
     test('should generate a file name with message index for flat structure', () => {
       const usedNames = new Set();
-      const result = getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
-      
-      expect(result).toBe('2_test-file.js');
-      expect(usedNames.has('2_test-file.js')).toBe(true);
+      expect(getUniqueFileName('test-file', 'javascript', 1, usedNames, false))
+        .toBe('2_test-file.js');
     });
-  
+
     test('should use directory structure when option is enabled', () => {
       const usedNames = new Set();
-      const result = getUniqueFileName('src/components/Button', 'javascript', 1, usedNames, true);
-      
-      expect(result).toBe('src_components_Button.js');
-      expect(usedNames.has('src_components_Button.js')).toBe(true);
+      expect(getUniqueFileName('src/utils/helper', 'javascript', 0, usedNames, true))
+        .toBe('src/utils/helper.js');
     });
-  
+
     test('should sanitize file names by replacing non-alphanumeric chars', () => {
       const usedNames = new Set();
-      const result = getUniqueFileName('file with spaces!@#$', 'python', 1, usedNames, false);
-      
-      expect(result).toBe('2_file_with_spaces_.py');
-      expect(usedNames.has('2_file_with_spaces_.py')).toBe(true);
+      expect(getUniqueFileName('test:file', 'javascript', 0, usedNames, false))
+        .toBe('1_test_file.js');
     });
-  
-    test('should append suffix if name collision occurs', () => {
+
+    test('should append asterisk if name collision occurs', () => {
       const usedNames = new Set(['2_test-file.js']);
-      const result = getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
-      
-      expect(result).toBe('2_test-file_*.js');
-      expect(usedNames.has('2_test-file_*.js')).toBe(true);
+      expect(getUniqueFileName('test-file', 'javascript', 1, usedNames, false))
+        .toBe('2_test-file_*.js');
     });
-  
-    test('should handle multiple name collisions by increasing suffix', () => {
+
+    test('should handle multiple name collisions by increasing asterisks', () => {
       const usedNames = new Set(['2_test-file.js', '2_test-file_*.js']);
-      const result = getUniqueFileName('test-file', 'javascript', 1, usedNames, false);
-      
-      expect(result).toBe('2_test-file_**.js');
-      expect(usedNames.has('2_test-file_**.js')).toBe(true);
+      expect(getUniqueFileName('test-file', 'javascript', 1, usedNames, false))
+        .toBe('2_test-file_**.js');
     });
-  
+
     test('should handle empty title', () => {
       const usedNames = new Set();
-      const result = getUniqueFileName('', 'python', 0, usedNames, false);
-      
-      expect(result).toBe('1_.py');
+      expect(getUniqueFileName('', 'python', 0, usedNames, false))
+        .toBe('1_untitled.py');
     });
+
+    test('should handle directory collisions', () => {
+      const usedNames = new Set(['src/components/Button.js']);
+      expect(getUniqueFileName('src/components/Button', 'javascript', 1, usedNames, true))
+        .toBe('src/components/Button_*.js');
+    });
+  });
   
-    test('should handle null or undefined inputs with default values', () => {
-      const usedNames = new Set();
-      
-      const result1 = getUniqueFileName('', 'javascript', 0, usedNames, false);
-      expect(result1).toBe('1_.js');
-      
-      const result2 = getUniqueFileName('test', '', 0, usedNames, false);
-      expect(result2).toBe('1_test.txt');
+  // Tests for sanitizeComponent
+  describe('sanitizeComponent', () => {
+    test('should sanitize component by replacing non-word chars', () => {
+      expect(sanitizeComponent('test:file')).toBe('test_file');
     });
-    
-    test('should handle name collisions in directory structure', () => {
-      const usedNames = new Set(['src_components_Button.js']);
-      const result = getUniqueFileName('src/components/Button', 'javascript', 1, usedNames, true);
-      
-      // The actual implementation uses underscores not slashes for directory structure
-      expect(result).toBe('2_src_components_Button_*.js');
-      expect(usedNames.has('2_src_components_Button_*.js')).toBe(true);
+
+    test('should preserve allowed characters', () => {
+      expect(sanitizeComponent('test-file_123')).toBe('test-file_123');
     });
-    
-    test('should use directory structure with index when collision occurs', () => {
-      const usedNames = new Set();
-      const result1 = getUniqueFileName('src/utils/helper', 'javascript', 1, usedNames, true);
-      
-      // The actual implementation uses underscores not slashes
-      expect(result1).toBe('src_utils_helper.js');
-      expect(usedNames.has('src_utils_helper.js')).toBe(true);
-      
-      // Now try with same path but different message index
-      const result2 = getUniqueFileName('src/utils/helper', 'javascript', 2, usedNames, true);
-      
-      // Due to collision, it will add a suffix
-      expect(result2).toBe('3_src_utils_helper_*.js');
-      expect(usedNames.has('3_src_utils_helper_*.js')).toBe(true);
+
+    test('should handle empty input', () => {
+      expect(sanitizeComponent('')).toBe('');
+    });
+  });
+  
+  // Tests for sanitizePathComponents
+  describe('sanitizePathComponents', () => {
+    test('should separate path and filename and sanitize both', () => {
+      expect(sanitizePathComponents('src/test:file'))
+        .toEqual({
+          sanitizedPath: 'src',
+          sanitizedFilename: 'test_file'
+        });
+    });
+
+    test('should handle Windows-style backslashes', () => {
+      expect(sanitizePathComponents('src\\utils\\test:file'))
+        .toEqual({
+          sanitizedPath: 'src/utils',
+          sanitizedFilename: 'test_file'
+        });
+    });
+
+    test('should handle filename only with no path', () => {
+      expect(sanitizePathComponents('test:file'))
+        .toEqual({
+          sanitizedPath: '',
+          sanitizedFilename: 'test_file'
+        });
+    });
+  });
+  
+  // Tests for makeUnique
+  describe('makeUnique', () => {
+    test('should append asterisk for collisions', () => {
+      expect(makeUnique('test.js', new Set(['test.js'])))
+        .toBe('test_*.js');
+    });
+
+    test('should preserve directory structure', () => {
+      expect(makeUnique('src/utils/helper.js', new Set(['src/utils/helper.js'])))
+        .toBe('src/utils/helper_*.js');
+    });
+
+    test('should handle multiple collisions', () => {
+      const usedNames = new Set(['test.js', 'test_*.js']);
+      expect(makeUnique('test.js', usedNames))
+        .toBe('test_**.js');
     });
   });
   

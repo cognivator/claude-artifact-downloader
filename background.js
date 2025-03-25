@@ -177,53 +177,117 @@ function extractArtifacts(text) {
   return artifacts;
 }
 
-// FIXME: This is not generating directory structures correctly
-function getUniqueFileName(
-  title,
-  language,
-  messageIndex,
-  usedNames,
-  useDirectoryStructure,
-) {
-  let baseName = title.replace(/[^\w\-._]+/g, "_");
-  let extension = getFileExtension(language);
-
-  let fileName = useDirectoryStructure
-    ? inferDirectoryStructure(baseName, extension)
-    : `${messageIndex + 1}_${baseName}${extension}`;
-  if (usedNames.has(fileName)) {
-    let suffix = "";
-    let suffixCount = 1;
-    while (usedNames.has(fileName)) {
-      suffix = `_${"*".repeat(suffixCount)}`;
-      fileName = useDirectoryStructure
-        ? inferDirectoryStructure(baseName, extension, messageIndex, suffix)
-        : `${messageIndex + 1}_${baseName}${suffix}${extension}`;
-      suffixCount++;
-    }
-  }
-
-  usedNames.add(fileName);
-  return fileName;
+/**
+ * Sanitize a single component (either path part or filename)
+ * 
+ * @param {string} component - The path component to sanitize
+ * @returns {string} Sanitized component
+ */
+function sanitizeComponent(component) {
+  return component.replace(/[^\w\-._]+/g, "_");
 }
 
-function inferDirectoryStructure(
-  baseName,
-  extension,
-  messageIndex = null,
-  suffix = "",
-) {
-  const parts = baseName.split("/");
-  if (parts.length > 1) {
-    const fileName = `${parts.pop()}${suffix}${extension}`;
-    const directory = parts.join("/");
-    return messageIndex !== null
-      ? `${directory}/${messageIndex + 1}_${fileName}`
-      : `${directory}/${fileName}`;
+/**
+ * Split a title into path and filename components and sanitize them
+ * 
+ * @param {string} title - The original title or path
+ * @returns {Object} Object containing sanitized path and filename
+ */
+function sanitizePathComponents(title) {
+  // Handle both Unix and Windows path separators
+  const parts = title.split(/[\/\\]/);
+  const filename = parts.pop() || "untitled";
+  
+  // Sanitize each part while preserving structure
+  const sanitizedPathParts = parts.map(part => sanitizeComponent(part));
+  const sanitizedPath = sanitizedPathParts.join('/');
+  const sanitizedFilename = sanitizeComponent(filename);
+  
+  return { sanitizedPath, sanitizedFilename };
+}
+
+/**
+ * Construct a file path based on the directory structure preference
+ * 
+ * @param {string} path - The sanitized path
+ * @param {string} filename - The sanitized filename
+ * @param {string} extension - The file extension
+ * @param {number} messageIndex - The message index
+ * @param {boolean} useDirectoryStructure - Whether to use directory structure
+ * @returns {string} The constructed file path
+ */
+function constructFilePath(path, filename, extension, messageIndex, useDirectoryStructure) {
+  if (useDirectoryStructure) {
+    return path ? `${path}/${filename}${extension}` : `${filename}${extension}`;
+  } else {
+    return `${messageIndex + 1}_${filename}${extension}`;
   }
-  return messageIndex !== null
-    ? `${messageIndex + 1}_${baseName}${suffix}${extension}`
-    : `${baseName}${suffix}${extension}`;
+}
+
+/**
+ * Make a filename unique by adding incremental counters
+ * 
+ * @param {string} fileName - The original filename
+ * @param {Set<string>} usedNames - Set of already used filenames
+ * @returns {string} A unique filename
+ */
+function makeUnique(filename, usedNames) {
+  if (!usedNames.has(filename)) {
+    return filename;
+  }
+
+  // Split filename into base and extension
+  const lastDotIndex = filename.lastIndexOf('.');
+  const base = lastDotIndex === -1 ? filename : filename.slice(0, lastDotIndex);
+  const ext = lastDotIndex === -1 ? '' : filename.slice(lastDotIndex);
+
+  // Try with single asterisk
+  let uniqueName = `${base}_*${ext}`;
+  if (!usedNames.has(uniqueName)) {
+    return uniqueName;
+  }
+
+  // Add more asterisks until unique
+  let asterisks = '*';
+  while (usedNames.has(uniqueName)) {
+    asterisks += '*';
+    uniqueName = `${base}_${asterisks}${ext}`;
+  }
+
+  return uniqueName;
+}
+
+/**
+ * Get a unique filename for an artifact, optionally preserving directory structure
+ * 
+ * @param {string} title - The original title or path of the artifact
+ * @param {string} language - The language/type of the artifact
+ * @param {number} messageIndex - The index of the message containing the artifact
+ * @param {Set<string>} usedNames - Set of already used filenames to avoid duplicates
+ * @param {boolean} useDirectoryStructure - Whether to maintain directory structure in the filename
+ * @returns {string} A unique sanitized filename
+ */
+function getUniqueFileName(title, language, messageIndex, usedNames, useDirectoryStructure) {
+  // Parse and sanitize the path components
+  const { sanitizedPath, sanitizedFilename } = sanitizePathComponents(title);
+  const extension = getFileExtension(language);
+  
+  // Construct the base filename according to the directory structure option
+  let fileName = constructFilePath(
+    sanitizedPath,
+    sanitizedFilename,
+    extension,
+    messageIndex,
+    useDirectoryStructure
+  );
+  
+  // If name is already used, make it unique
+  if (usedNames.has(fileName)) {
+    fileName = makeUnique(fileName, usedNames);
+  }
+  
+  usedNames.add(fileName);
+  return fileName;
 }
 
 function getFileExtension(language) {
