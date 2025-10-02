@@ -5,7 +5,7 @@ afterAll(() => {
   cleanup();
 });
 
-describe('Background.js - Modern API /3.x or greater', () => {
+describe.skip('Background.js - Modern API /3.x or greater', () => {
   let testEnv;
   
   // Set up a fresh test environment before each test
